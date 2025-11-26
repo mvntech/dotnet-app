@@ -8,6 +8,6 @@ namespace dotnet_app.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options) : base(options)
         {
         }
-        DbSet<Student>Students { get; set; }
+        public DbSet<Student>Students { get; set; }
     }
 }
