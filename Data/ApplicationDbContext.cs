@@ -9,5 +9,6 @@ namespace dotnet_app.Data
         {
         }
         public DbSet<Student>Students { get; set; }
+        public DbSet<Faculty> Faculty { get; set; } = default!;
     }
 }
