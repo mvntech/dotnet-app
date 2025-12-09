@@ -13,10 +13,12 @@ namespace dotnet_app.Controllers
     public class FacultiesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public FacultiesController(ApplicationDbContext context)
+        public FacultiesController(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         // GET: Faculties
@@ -46,29 +48,6 @@ namespace dotnet_app.Controllers
         // GET: Faculties/Create
         public IActionResult Create()
         {
-            List<SelectListItem> Gender = new()
-            {
-                new SelectListItem{Value="Male", Text="Male"},
-                new SelectListItem{Value="Female", Text="Female"}
-            };
-            ViewBag.Gender = Gender;
-
-            List<SelectListItem> City = new()
-            {
-                new SelectListItem{Value="Karachi", Text="Karachi"},
-                new SelectListItem{Value="Lahore", Text="Lahore"},
-                new SelectListItem{Value="Islamabad", Text="Islamabad"},
-            };
-            ViewBag.City = City;
-
-            List<SelectListItem> Education = new()
-            {
-                new SelectListItem{Value="Matric", Text="Matric"},
-                new SelectListItem{Value="Intermediate", Text="Intermediate"},
-                new SelectListItem{Value="Graduation", Text="Graduation"},
-                new SelectListItem{Value="Masters", Text="Masters"},
-            };
-            ViewBag.Education = Education;
             return View();
         }
 
@@ -77,15 +56,41 @@ namespace dotnet_app.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Department,Salary,Image")] Faculty faculty)
+        public async Task<IActionResult> Create([Bind("Id,Name,Email,Department,Salary,Image")] Faculty faculty, IFormFile file)
         {
-            if (ModelState.IsValid)
+            ModelState.Remove("Image");
+            if (!ModelState.IsValid)
             {
-                _context.Add(faculty);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(faculty);
             }
-            return View(faculty);
+            if (file == null || file.Length == 0)
+            {
+                ViewBag.Error = "Please select an image file.";
+                return View(faculty);
+            }
+            string extension = Path.GetExtension(file.FileName).ToLower();
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            if (!allowedExtensions.Contains(extension))
+            {
+                ViewBag.Error = "Only JPG, JPEG, and PNG files are allowed.";
+                return View(faculty);
+            }
+            string uploadFolder = Path.Combine(_env.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+            string fileName = Guid.NewGuid().ToString() + extension;
+            string filePath = Path.Combine(uploadFolder, fileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+            faculty.Image = "uploads/" + fileName;
+            _context.Faculty.Add(faculty);
+            await _context.SaveChangesAsync();
+            ViewBag.Faculties = new SelectList(_context.Faculty, "Id", "Name");
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Faculties/Edit/5
