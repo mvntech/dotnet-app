@@ -14,5 +14,11 @@ namespace dotnet_app.Models
         public string Phone { get; set; }
         [Required]
         public int Age { get; set; }
+        [Required]
+        public string Gender { get; set; }
+        [Required]
+        public string Education { get; set; }
+        [Required]
+        public string City { get; set; }
     }
 }

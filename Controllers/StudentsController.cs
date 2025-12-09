@@ -19,6 +19,27 @@ namespace dotnet_app.Controllers
             _context = context;
         }
 
+        public enum Gender
+        {
+            Male,
+            Female
+        }
+
+        public enum Education
+        {
+            Matric,
+            Intermediate,
+            Graduation,
+            Masters
+        }
+
+        public enum City
+        {
+            Karachi,
+            Lahore,
+            Islamabad
+        }
+
         // GET: Students
         public async Task<IActionResult> Index()
         {
@@ -46,6 +67,29 @@ namespace dotnet_app.Controllers
         // GET: Students/Create
         public IActionResult Create()
         {
+            List<SelectListItem> Gender = new()
+            {
+                new SelectListItem{Value="Male", Text="Male"},
+                new SelectListItem{Value="Female", Text="Female"}
+            };
+            ViewBag.Gender = Gender;
+
+            List<SelectListItem> City = new()
+            {
+                new SelectListItem{Value="Karachi", Text="Karachi"},
+                new SelectListItem{Value="Lahore", Text="Lahore"},
+                new SelectListItem{Value="Islamabad", Text="Islamabad"},
+            };
+            ViewBag.City = City;
+
+            List<SelectListItem> Education = new()
+            {
+                new SelectListItem{Value="Matric", Text="Matric"},
+                new SelectListItem{Value="Intermediate", Text="Intermediate"},
+                new SelectListItem{Value="Graduation", Text="Graduation"},
+                new SelectListItem{Value="Masters", Text="Masters"},
+            };
+            ViewBag.Education = Education;
             return View();
         }
 
@@ -54,7 +98,7 @@ namespace dotnet_app.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Phone,Age")] Student student)
+        public async Task<IActionResult> Create([Bind("Id,Name,Email,Phone,Age,Gender,City,Education")] Student student)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +130,7 @@ namespace dotnet_app.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Phone,Age")] Student student)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Phone,Age,Gender,City,Education")] Student student)
         {
             if (id != student.Id)
             {
