@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using dotnet_app.Data;
 using dotnet_app.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace dotnet_app.Controllers
 {
@@ -46,6 +47,7 @@ namespace dotnet_app.Controllers
         }
 
         // GET: Faculties/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -93,6 +95,7 @@ namespace dotnet_app.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Faculties/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -144,6 +147,7 @@ namespace dotnet_app.Controllers
             return View(faculty);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Faculties/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
